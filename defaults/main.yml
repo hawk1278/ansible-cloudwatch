@@ -1,0 +1,9 @@
+---
+awslogs_install_command: "python /tmp/awslogs-agent-setup.py -r {{ec2_region | default('us-east-1')}} -n -c /var/awslogs/etc/config/awslogs.conf"
+
+log_streams:
+  squid:
+    log_stream: squid_access_logs
+    log_file: /var/log/squid3/access.log
+    position: start_of_file
+    group_name: squid_logs

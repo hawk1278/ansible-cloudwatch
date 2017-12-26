@@ -1,0 +1,32 @@
+---
+- name: Check if awslogs is already installed
+  stat: path=/var/awslogs/bin
+  register: awslogs_bin_dir
+
+- include: install.yml
+
+- name: Run awslogs agent setup
+  command: "{{ awslogs_install_command }}"
+  ignore_errors: yes
+  register: awslogs_install
+
+- name: Create logstream configuration
+  template:
+    src: awslogs.conf.j2
+    dest: /var/awslogs/etc/config/awslogs.conf
+    owner: root
+    group: root
+    mode: 0644
+  notify: restart awslogs
+
+- name: Re-run awslogs agent setup
+  command: "{{awslogs_install_command}}"
+  when: awslogs_install|failed
+
+- name: Start and enable awslogs service
+  service: name=awslogs state=started enabled=yes
+  when: ansible_distribution_release == 'trusty'
+
+- name: Start and enable awslogs systemd service
+  systemd: name=awslogs state=started enabled=yes daemon_reload=yes
+  when: ansible_distribution_release == 'xenial'

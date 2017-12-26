@@ -1,0 +1,17 @@
+---
+- name: Download the cloudwatch logs agent
+  get_url:
+    url: https://s3.amazonaws.com/aws-cloudwatch/downloads/latest/awslogs-agent-setup.py
+    dest: /tmp/awslogs-agent-setup.py
+    mode: 0750
+
+- name: Setup creds dir
+  file: path=/root/.aws state=directory 
+- name: Setup creds
+  copy:
+    src: credentials
+    dest: /root/.aws/credentials
+    mode: 0600
+    group: 0600
+    owner: root
+
